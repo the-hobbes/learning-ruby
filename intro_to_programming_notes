@@ -1,0 +1,31 @@
+#!/usr/bin/ruby
+
+=begin
+  - computer programs manipulate data into more useful forms.
+  - one of the most basic datatypes a program manipulates are numbers.
+  - an expression is some kind of numbers / operators / variables:
+    1 + 1 = 2, "a" + "b" + "c"
+
+  - variables are placeholders or references to objects.
+    - variables are containers for storing data.
+    - variables are important because they let you write programs that can act
+      upon varying data, which makes them flexible:
+      1 + 1 = 2, vs x + y = n where x and y can be any number.
+  - putting something inside a variable is called assignment:
+    x = 10, you assign the variable x the value of 10
+  - variable names must be valid
+
+  - programs are more than just calculators, they can use logic to determine
+    what they should do. One of the ways they can decide what to do is by using
+    comparison.
+  - age gate on a google account example: the minimum age on a google account is
+    13 years. How would a computer program determine if a person is old enough,
+    based on their birhday?
+    - the computer would compute the number of years old a person is, then
+      compare that age with the minimum age. For example:
+      your_age = 25, minimum_age = 13, if your_age >= minimum_age then give
+      account.
+      
+=end
+
+
