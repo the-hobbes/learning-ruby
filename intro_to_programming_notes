@@ -5,6 +5,8 @@
   - one of the most basic datatypes a program manipulates are numbers.
   - an expression is some kind of numbers / operators / variables:
     1 + 1 = 2, "a" + "b" + "c"
+  - two kinds of numbers, floating point and integer.
+  - constants are unchanging values, like pi.
 
   - variables are placeholders or references to objects.
     - variables are containers for storing data.
@@ -25,7 +27,29 @@
       compare that age with the minimum age. For example:
       your_age = 25, minimum_age = 13, if your_age >= minimum_age then give
       account.
-      
-=end
+  - you can use many kinds of comparator operators, including ==, !=, ||, && and
+    any combination of them.
+  
+  - Loops: blocks and iterators, or how to repeat actions over and over.
+    - the code between {} or do and end is a block
+    - iterators support the each method, where the code in a block is passed to
+      the each method, which runs the block for each element in the iterator.
+    - ways to declare a loop:
+      5.times do puts "Hello" end # good for multi-line code blocks
+      5.times { puts "Hello" } # good for single lines of code
+    - these are both iterators, which processes a loop one by one. You can get
+      at the value being iterated by passing the state of the iteration to the
+      code as a parameter:
+      5.times { |number| puts number }
+    - there are many other types of iterators (e.g., 1.upto(5))
+  - for loops: for i in 0...5 do puts i end
+  - while loops:  loop code based on the result of a comparison made each loop.
+    x = 1
+    while x < 100
+      puts x
+      x = x + 1
+    end
+    - see also 'until' loops
+end
 
 
