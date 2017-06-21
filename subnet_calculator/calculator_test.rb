@@ -2,7 +2,6 @@
 
 require_relative "calculator"
 require "test/unit"
-require "mocha/test_unit"
 
 
 class TestMaskToCidr < Test::Unit::TestCase

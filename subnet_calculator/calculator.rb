@@ -64,6 +64,7 @@ def scan_range(ip_range)
       puts "#{ip_address} is active!"
     end
   puts "Done scanning."
+  end
 end
 
 # TODO: Get network mask from primary interface
