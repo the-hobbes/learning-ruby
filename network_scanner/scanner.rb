@@ -6,18 +6,6 @@ require "optparse"
 require "progress_bar"
 
 
-# Convert an subnet mask to cidr notation.
-# Args:
-#   - mask (string) the subnet mask to be converted.
-# Returns:
-#   - cidr (string) the cidr representation of the mask.
-def mask_to_cidr(mask)
-  int_mask = IPAddr.new(mask).to_i  # the int representation of the mask IP
-  base_2 = int_mask.to_s(2)  # the base 2 representation of the integer
-  ones = base_2.count("1")  # the number of 1's in the base 2 representation
-  return "/#{ones}"
-end
-
 # Creates a range of IP addresses.
 #
 # The range begins at the network address and continues until the broadcast
@@ -30,7 +18,7 @@ end
 # Returns:
 #   - (array of strings) the list of ips in the network
 def get_network_range(ip, mask)
-  formatted_ip = ip + mask
+  formatted_ip = "#{ip}/#{mask}"
   ip_range = []
   IPAddr.new(formatted_ip).to_range.each do |ip_object|
     ip_range.push(ip_object.to_s)
@@ -77,9 +65,9 @@ OptionParser.new do |opts|
 
 end.parse!
 
-cidr_notation = mask_to_cidr(args["netmask"])
-address_range = get_network_range(args["ipaddress"], cidr_notation)
-active_ips = scan_range(address_range)
-puts "The following addresses responded to ping on your network:"
-active_ips.each { |ip| puts ip }
-
+if args.length > 0  # To get the tests to run without expecting commandline input
+	address_range = get_network_range(args["ipaddress"], args["netmask"])
+	active_ips = scan_range(address_range)
+	puts "The following addresses responded to ping on your network:"
+	active_ips.each { |ip| puts ip }
+end

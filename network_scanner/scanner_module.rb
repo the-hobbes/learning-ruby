@@ -15,4 +15,17 @@ module Scanner
     end
     return ipv4_addresses.pop
   end
+
+  # Convert an subnet mask to cidr notation.
+  # Args:
+  #   - mask (string) the subnet mask to be converted.
+  # Returns:
+  #   - cidr (string) the cidr representation of the mask.
+  def Scanner.mask_to_cidr(mask)
+    int_mask = IPAddr.new(mask).to_i  # the int representation of the mask IP
+    base_2 = int_mask.to_s(2)  # the base 2 representation of the integer
+    ones = base_2.count("1")  # the number of 1's in the base 2 representation
+    return "/#{ones}"
+  end
+
 end
