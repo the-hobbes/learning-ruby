@@ -2,6 +2,8 @@
 
 require "ipaddr"
 require "net/ping"
+require "optparse"
+require "progress_bar"
 
 
 # Convert an subnet mask to cidr notation.
@@ -14,23 +16,6 @@ def mask_to_cidr(mask)
   base_2 = int_mask.to_s(2)  # the base 2 representation of the integer
   ones = base_2.count("1")  # the number of 1's in the base 2 representation
   return "/#{ones}"
-end
-
-# Get local IP address
-# Usually the first one: Socket.ip_address_list[1].ip_address
-# But this will check:
-def get_local_ip
-  ipv4_addresses = []
-  Socket.ip_address_list.each do |address|
-    if address.ipv4? and address.ip_address != "127.0.0.1"
-      ipv4_addresses.push(address.ip_address)
-    end
-  end
-  # Raise an error if we have more than one possibly primary address
-  if ipv4_addresses.length != 1
-    raise "Unable to uniquely identify primary network interface address."
-  end
-  return ipv4_addresses.pop
 end
 
 # Creates a range of IP addresses.
@@ -57,16 +42,44 @@ end
 #
 # Args:
 #   - ip_range (array of strings) a list of ips to ping
+# Returns:
+#   - active_ips (array of strings) a list of ips that responded to ping
 def scan_range(ip_range)
-  puts "Begin scanning..."
+  active_ips = []
+  puts "Scanning..."
+  # Progress bar: https://rubygems.org/gems/progress_bar
+  bar = ProgressBar.new(ip_range.length) 
   ip_range.each do |ip_address|
     if Net::Ping::External.new(ip_address).ping?
-      puts "#{ip_address} is active!"
+      active_ips.push(ip_address)
     end
-  puts "Done scanning."
+    # methods that end in ! indicate they modify the object they are called on
+    bar.increment!
   end
+  puts "Done scanning!"
+  return active_ips
 end
 
-# TODO: Get network mask from primary interface
-# TODO: tie functions together.
+# Use the OptionParser class to take in command-line arguments from the user.
+# Two arguments are expected: an IP address on the network you wish to scan,
+# and the subnet mask applied to that IP address. This information can be found
+# via ifconfig on a Unix-like system or ipconfig on a Windows system.
+args = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: ./scanner.rb [args]"
+
+  opts.on("-p", "--ipaddress ADDRESS", "ip address") do |p|
+    args["ipaddress"] = p
+  end
+  opts.on("-m", "--netmask MASK", "network mask") do |m|
+    args["netmask"] = m
+  end
+
+end.parse!
+
+cidr_notation = mask_to_cidr(args["netmask"])
+address_range = get_network_range(args["ipaddress"], cidr_notation)
+active_ips = scan_range(address_range)
+puts "The following addresses responded to ping on your network:"
+active_ips.each { |ip| puts ip }
 
