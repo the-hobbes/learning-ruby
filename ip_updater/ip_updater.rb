@@ -3,26 +3,23 @@
 # Queries the whatismyipaddress api to get the public API, then emails a user
 # if the address has changed.
 #
-# Crontab file looks like:
-# * * * * *  /bin/bash -l -c 'ruby ~/Repositories/learning-ruby/curler/curler.rb -e EMAIL@ADDRESS.com'
+# Hourly crontab file looks like:
+# 0 * * * *  /bin/bash -l -c 'ruby /full/path/to/script/ip_updater.rb -e EMAIL@ADDRESS.com -f /full/path/to/file/address' &>/dev/null
 
 require 'net/http'
 require 'uri'
-require 'syslog/logger'
 require 'optparse'
 
 
+$ADDRESS_FILE = "address"
+
 def email(new_address, email)
-  cmd = "echo \"Address changed to #{new_address}\" | ssmtp #{email}"
+  cmd = "/bin/echo \"Address changed to #{new_address}\" | /usr/sbin/ssmtp #{email}"
   value = `#{cmd}`
-  if $?.exitstatus != 0
-    log = Syslog::Logger.new "address_change_notification"
-    log.info "Email send failed with code #{$?.exitstatus} and value #{value}"
-  end
 end
 
 def update_file(new_address)
-  File.open("./address", "w") do |f|
+  File.open($ADDRESS_FILE, "w") do |f|
     f.write(new_address)
   end
 end
@@ -35,6 +32,9 @@ def main
     opts.on("-e", "--email ADDRESS", "email address") do |e|
       args["emailaddress"] = e
     end
+    opts.on("-f", "--address_file ADDRESS_FILE", "file to track ip address") do |f|
+      $ADDRESS_FILE = f
+    end
   end.parse!
 
 
@@ -43,8 +43,8 @@ def main
   old_ip = ""
 
   if response.code == "200"
-    if File::exists?("./address")
-      File.open("./address") do |f|
+    if File::exists?($ADDRESS_FILE)
+      File.open($ADDRESS_FILE) do |f|
         old_ip = f.readline
         if old_ip != response.body
           f.close
@@ -53,7 +53,7 @@ def main
         end
       end
     else
-      File.open("address", "w") do |f|
+      File.open($ADDRESS_FILE, "w") do |f|
         f.write(response.body)
       end
     end    
